@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>KTC · SEM — Student Assessment MIS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--g:#163A2B;--g2:#1f4f3a;--gold:#C29B3B;--gold2:#e7d3a1;--paper:#f4f3ee;--card:#fff;--tint:#edf2ec;--ink:#1a231d;--muted:#5a6b5e;--line:#dde3d8;--ok:#2a7a4b;--err:#b03030;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+.lw{min-height:100vh;display:grid;place-items:center;background:var(--g);padding:1rem}
+.lc{background:#fff;border-radius:16px;padding:2rem;width:100%;max-width:360px}
+.ll{display:flex;align-items:center;gap:.7rem;margin-bottom:1.4rem}
+.lb2{width:44px;height:44px;border-radius:11px;background:var(--g);display:grid;place-items:center;font-weight:900;font-size:.85rem;color:var(--gold);letter-spacing:-.5px}
+.lt{font-size:1.05rem;font-weight:700;color:var(--g)}.ls{font-size:.72rem;color:var(--muted)}
+.lf{margin-bottom:.85rem}.lf label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);margin-bottom:.3rem}
+.lf input{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:9px;padding:.6rem .75rem;font:inherit;color:var(--ink)}
+.lf input:focus{outline:none;border-color:var(--gold)}
+.lf .hint{font-size:.63rem;color:var(--muted);margin-top:.2rem}
+.lbtn{width:100%;background:var(--g);color:var(--gold);border:none;border-radius:10px;padding:.75rem;font:inherit;font-weight:700;font-size:.95rem;cursor:pointer}
+.lbtn:disabled{opacity:.6;cursor:progress}
+.lerr{margin-top:.65rem;padding:.55rem .75rem;background:#fbe8e8;color:#8c2828;border-radius:8px;font-size:.8rem;display:none}
+.lerr.show{display:block}
+.shell{display:none;height:100vh;overflow:hidden}.shell.active{display:flex}
+.sb{width:220px;flex:0 0 220px;background:var(--g);display:flex;flex-direction:column;overflow:hidden}
+.sbh{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sblogo{display:flex;align-items:center;gap:.65rem}
+.sbbadge{width:34px;height:34px;border-radius:8px;background:var(--gold);color:var(--g);display:grid;place-items:center;font-weight:900;font-size:.7rem;flex:0 0 auto;letter-spacing:-.5px}
+.sbname{color:#fff;font-size:.84rem;font-weight:700;line-height:1.2}.sbsub{color:rgba(255,255,255,.4);font-size:.58rem}
+.sbu{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sbav{width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--g);display:grid;place-items:center;font-size:.65rem;font-weight:800;flex:0 0 auto}
+.sburow{display:flex;align-items:center;gap:.6rem}
+.sbun{color:#fff;font-size:.78rem;font-weight:600}
+.sbrl{margin-top:3px}
+.srrole{font-size:.6rem;padding:2px 7px;border-radius:99px;font-weight:700;display:inline-block}
+.sr-operator{background:var(--gold);color:var(--g)}.sr-admin{background:#378ADD;color:#042C53}
+.sr-rater{background:#1D9E75;color:#04342C}
+.sbnav{flex:1;padding:5px 0;overflow-y:auto}
+.ns{font-size:.6rem;color:rgba(255,255,255,.3);padding:8px 14px 2px;text-transform:uppercase;letter-spacing:.08em}
+.ni{display:flex;align-items:center;gap:.65rem;padding:9px 14px;color:rgba(255,255,255,.6);font-size:.79rem;cursor:pointer;border-left:3px solid transparent;transition:background .15s}
+.ni:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.ni.active{background:rgba(255,255,255,.13);color:#fff;border-left-color:var(--gold)}
+.ni svg{width:15px;height:15px;flex:0 0 auto;opacity:.7}.ni.active svg{opacity:1}
+.sbft{padding:10px 14px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:4px}
+.sbfb{display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.45);font-size:.72rem;cursor:pointer;background:none;border:none;padding:3px 0;width:100%}
+.sbfb:hover{color:rgba(255,255,255,.75)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex:0 0 auto}
+.ptitle{font-size:1rem;font-weight:700;color:var(--g)}
+.tbr{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.content{flex:1;overflow-y:auto;padding:1rem 1.2rem 3rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:.95rem 1.05rem;margin-bottom:.8rem}
+.pnt{font-size:.87rem;font-weight:700;color:var(--g);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.pnt span{font-weight:400;color:var(--muted);font-size:.7rem}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.65rem;margin-bottom:.8rem}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:.8rem .95rem}
+.kpin{font-size:1.55rem;font-weight:800;color:var(--g);line-height:1}.kpil{font-size:.66rem;color:var(--muted);margin-top:.2rem}
+.kpi.gold{background:var(--g)}.kpi.gold .kpin{color:var(--gold2)}.kpi.gold .kpil{color:rgba(255,255,255,.6)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.77rem}
+th{background:var(--g);color:#fff;font-weight:600;padding:.42rem .55rem;text-align:left;white-space:nowrap;cursor:pointer}
+th:hover{background:var(--g2)}
+td{border:1px solid var(--line);padding:.4rem .55rem;white-space:nowrap}
+tbody tr:nth-child(even){background:var(--tint)}
+tbody tr:hover{background:#e8f0e6}
+td.r{text-align:right}
+.tlink{color:var(--g);cursor:pointer;text-decoration:underline}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.field{display:flex;flex-direction:column;gap:.22rem}
+.field label{font-size:.7rem;font-weight:600;color:var(--muted)}
+.field .hint{font-size:.62rem;color:var(--muted);font-style:italic}
+.field input,.field select,.field textarea{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:.5rem .62rem;font:inherit;color:var(--ink);width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(194,155,59,.1)}
+.field textarea{min-height:55px;resize:vertical}
+.field.full{grid-column:1/-1}
+.fa{margin-top:.8rem;display:flex;gap:.45rem;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;font:inherit;font-weight:700;cursor:pointer;border:none;border-radius:9px;padding:.6rem 1rem;font-size:.82rem}
+.bp{background:var(--gold);color:var(--g)}.bp:hover{filter:brightness(1.04)}.bp:disabled{opacity:.55;cursor:progress}
+.bg{background:#fff;border:1.5px solid var(--line);color:var(--g)}
+.bd{background:#fbe8e8;border:1.5px solid #eec3c3;color:var(--err)}
+.bsm{padding:.35rem .65rem;font-size:.72rem;border-radius:7px}
+.pill{font-size:.63rem;padding:2px 7px;border-radius:99px;font-weight:600}
+.pg{background:#e1f5ee;color:#085041}.pb{background:#e6f1fb;color:#0C447C}
+.po{background:#faeeda;color:#633806}.pr{background:#fbe8e8;color:#8c2828}
+.pp{background:#EEEDFE;color:#3C3489}
+.msg{padding:.55rem .75rem;border-radius:8px;font-size:.8rem;display:none;margin-top:.45rem}
+.msg.show{display:block}.mok{background:#e5f3eb;color:#1b5e38;border:1px solid #b8dfc8}
+.merr{background:#fbe8e8;color:#8c2828;border:1px solid #edc0c0}
+.mwarn{background:#faeeda;color:#633806;border:1px solid #e7d3a1}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto}
+.mbg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:1.35rem;width:100%;max-width:620px;position:relative}
+.modal.wide{max-width:860px}
+.mt2{font-size:.98rem;font-weight:700;color:var(--g);margin-bottom:1rem;padding-bottom:.55rem;border-bottom:1px solid var(--line);padding-right:1.5rem}
+.mc{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--muted)}
+.tabs{display:flex;gap:0;margin-bottom:1rem;border-bottom:1.5px solid var(--line);flex-wrap:wrap}
+.tab{padding:.55rem .9rem;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
+.tab.active{color:var(--g);border-bottom-color:var(--gold)}
+.tpanel{display:none}.tpanel.active{display:block}
+/* Score grid */
+.score-grid{display:grid;grid-template-columns:1fr;gap:.55rem}
+.score-row{background:var(--tint);border-radius:9px;padding:.65rem .8rem;display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:start}
+.score-label{font-size:.78rem;font-weight:700;color:var(--g)}
+.score-sublabel{font-size:.63rem;color:var(--muted);margin-top:1px}
+.score-inputs{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.score-sel{background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:.38rem .5rem;font:inherit;font-size:.78rem;color:var(--ink);min-width:120px}
+.score-sel:focus{outline:none;border-color:var(--gold)}
+.score-comment{background:#fff;border:1.5px solid var(--line);border-radius:7px;padding:.38rem .6rem;font:inherit;font-size:.73rem;width:100%;margin-top:.35rem;resize:none;min-height:38px}
+.score-comment:focus{outline:none;border-color:var(--gold)}
+/* Score badge colors */
+.sc0{background:#f1efea;color:#5f6b62}.sc1{background:#fbe8e8;color:#8c2828}
+.sc2{background:#fde8d8;color:#7a3010}.sc3{background:#faeeda;color:#633806}
+.sc4{background:#e6f1fb;color:#0C447C}.sc5{background:#e1f5ee;color:#085041}
+/* Student cards */
+.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.65rem}
+.stcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:.85rem 1rem;cursor:pointer;transition:border-color .15s}
+.stcard:hover{border-color:var(--gold)}
+.stav{width:36px;height:36px;border-radius:50%;background:var(--tint);color:var(--g);display:grid;place-items:center;font-size:.7rem;font-weight:700;flex:0 0 auto}
+/* Progress bar */
+.prog{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:.3rem}
+.progf{height:100%;background:var(--gold);border-radius:99px;transition:width .4s}
+/* Status badges */
+.status-open{background:#e1f5ee;color:#085041}.status-closed{background:#fbe8e8;color:#8c2828}
+.status-active{background:#e1f5ee;color:#085041}.status-late{background:#faeeda;color:#633806}
+.sbar{display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap;align-items:center}
+.sbar input,.sbar select{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:.48rem .65rem;font:inherit;font-size:.8rem;color:var(--ink)}
+.sbar input{flex:1;min-width:160px}
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--gold);border-radius:0 0 8px 8px;z-index:50;max-height:180px;overflow-y:auto;display:none}
+.ac-list.open{display:block}
+.ac-item{padding:.4rem .65rem;font-size:.78rem;cursor:pointer;border-bottom:.5px solid var(--line)}
+.ac-item:hover{background:var(--tint)}
+.empty{text-align:center;color:var(--muted);padding:2.5rem 1rem;font-size:.84rem}
+.loading{text-align:center;color:var(--muted);padding:2rem;font-size:.84rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.spinner{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rater-status{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.rs{font-size:.68rem;padding:3px 9px;border-radius:99px;font-weight:600}
+.rs-done{background:#e1f5ee;color:#085041}.rs-edited{background:#e6f1fb;color:#0C447C}
+.rs-pending{background:#faeeda;color:#633806}
+@media(max-width:640px){
+.sb{width:52px;flex:0 0 52px}.sbname,.sbsub,.sbun,.sbrl,.ni span,.ns,.sbft .sbfb span{display:none}
+.sbbadge{margin:auto}.fg{grid-template-columns:1fr}.field.full{grid-column:1}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="lw" id="loginWrap">
+  <div class="lc">
+    <div class="ll">
+      <div class="lb2">KTC</div>
+      <div><div class="lt">KTC · SEM</div><div class="ls">Student Assessment Management System<br>Kibidula Training Centre of Evangelism</div></div>
+    </div>
+    <div class="lf"><label>Username</label><input type="text" id="lUser" placeholder="Your username" autocomplete="username"><div class="hint">Not case-sensitive</div></div>
+    <div class="lf"><label>Password</label><input type="password" id="lPass" placeholder="Your password" autocomplete="current-password"><div class="hint">Case-sensitive</div></div>
+    <button class="lbtn" id="lBtn">Sign in</button>
+    <div class="lerr" id="lErr"></div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="shell" id="appShell">
+  <div class="sb">
+    <div class="sbh"><div class="sblogo"><div class="sbbadge">KTC</div><div><div class="sbname">KTC · SEM</div><div class="sbsub">Student Assessment MIS</div></div></div></div>
+    <div class="sbu"><div class="sburow"><div class="sbav" id="sbAv">--</div><div><div class="sbun" id="sbName">--</div><div class="sbrl" id="sbRole"></div></div></div></div>
+    <div class="sbnav" id="sbNav">
+      <div class="ns">Main</div>
+      <div class="ni" data-page="dashboard" data-acc="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></div>
+      <div class="ns">Assessment</div>
+      <div class="ni" data-page="assess" data-acc="scores">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>My assessments</span></div>
+      <div class="ns">Admin</div>
+      <div class="ni" data-page="students" data-acc="students">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Students</span></div>
+      <div class="ni" data-page="semesters" data-acc="semesters">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Semesters</span></div>
+      <div class="ni" data-page="sessions" data-acc="sessions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Assessment sessions</span></div>
+      <div class="ni" data-page="staff" data-acc="staff">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Staff accounts</span></div>
+      <div class="ni" data-page="reports" data-acc="reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Reports</span></div>
+    </div>
+    <div class="sbft">
+      <button class="sbfb" id="cpBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Change password</span></button>
+      <button class="sbfb" id="soBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Sign out</span></button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="ptitle" id="pTitle">Dashboard</div><div class="tbr" id="tbr"></div></div>
+    <div class="content" id="pc"><div class="loading"><div class="spinner"></div>Loading…</div></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mbg" id="mBg"><div class="modal" id="mBox"><button class="mc" id="mClose">✕</button><div class="mt2" id="mTitle"></div><div id="mBody"></div></div></div>
+
+<script>
+const URL_="https://script.google.com/macros/s/AKfycbxag2X9jkGtf1OYuuvirgb2ddDjT5aeOf7ndhY6XzoTW1tjiS7Fhx_YHnjdbpQlrhTK/exec";
+
+const CATS=[
+  {id:"nidhamu",en:"Discipline",sw:"Nidhamu"},
+  {id:"kujisimamia",en:"Self-management",sw:"Kujisimamia Binafsi"},
+  {id:"kutunza_muda",en:"Time-keeping",sw:"Kutunza Muda"},
+  {id:"uwezo_kazi",en:"Work ability",sw:"Uwezo wa Kufanya Kazi"},
+  {id:"usafi",en:"Hygiene",sw:"Usafi wa Nje na Ndani"},
+  {id:"uwezo_masomo",en:"Receptiveness",sw:"Uwezo wa Kupokea Masomo"}
+];
+
+const SCALE={0:"0 — Hafifu/Mbaya Sana",1:"1 — Hafifu/Mbaya",2:"2 — Si Nzuri/Vizuri",3:"3 — Wastani",4:"4 — Nzuri/Vizuri",5:"5 — Nzuri/Vizuri Sana"};
+
+const SEM2_STUDENTS=["ADONIA SADIKI","ALLY SAID SHABANI","ALOYCE KIMIMBI","ALSEN MATHIAS","AMOS RAPHAEL MAPUNDA","BARAKA SAFARI ANTONI","EDIGA KALAVER FUNGAMEZA","EDYSON C ZUMBA","EMMANUEL JAPHETH","EMMANUEL KABUCHANDA","ERICK HYELA","EZRA MARKO","FAUSTINE JOACHIM","FRANK R ANTHONY","GABRIELI A MWANISENGA","GEORGE MWOGOFI","HABAKUKI YONAH SHADRACK","HOSEA BONIFACE MTONYOLE","IMANI JACKSON SAIBU","IVAN MWITWA MALIYATABU","JACKSON MWAMBENE","JACOB LUKAS BAHAME","JAPHETH MARKO SHIJA","JOEL MSHINGILWA","JOHNSON JOHN MOSES KIVUNGE","MAGNUS DONATUS RWEIKAZA","MICHAEL MGOMERA","MUSA J MAKOLOLOMA","MUSA MTELEMKO","NEHEMIA LUKASI","NORBERT ALBAN MARTIN","PASCAL CASMELI MKOBA","RABAN MICHAEL","RIZIKI AMBROCE NJOVU","SIJAONA P KASEBELE","WILLIAM FRANCIS KALOLI"];
+
+const TZ_REGIONS=["Arusha","Dar es Salaam","Dodoma","Geita","Iringa","Kagera","Katavi","Kigoma","Kilimanjaro","Lindi","Manyara","Mara","Mbeya","Morogoro","Mtwara","Mwanza","Njombe","Pwani","Rukwa","Ruvuma","Shinyanga","Simiyu","Singida","Songwe","Tabora","Tanga","Pemba North","Pemba South","Unguja North","Unguja South","Zanzibar Urban"];
+
+const NATIONALITIES=["Tanzania","Kenya","Uganda","Rwanda","Burundi","Congo (DRC)","Malawi","Zambia","Zimbabwe","Mozambique","South Africa","Ethiopia","Sudan","Ghana","Nigeria","Other"];
+
+let USER=null;
+const CACHE={},CACHE_TS={};
+const TTL=120000;
+function isFresh(k){return CACHE[k]&&(Date.now()-CACHE_TS[k])<TTL;}
+function setCache(k,v){CACHE[k]=v;CACHE_TS[k]=Date.now();}
+function clearCache(){Object.keys(CACHE).forEach(k=>{delete CACHE[k];delete CACHE_TS[k];});}
+
+async function GET(params){
+  const q=new URLSearchParams({...params,username:USER.username,password:USER.password});
+  try{
+    const res=await fetch(URL_+"?"+q);
+    const text=await res.text();
+    if(text.trim().startsWith("<")) return {ok:false,error:"Server error — try again"};
+    return JSON.parse(text);
+  }catch(e){return {ok:false,error:e.message};}
+}
+async function POST(body){
+  try{
+    const res=await fetch(URL_,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...body,username:USER.username,password:USER.password})});
+    const text=await res.text();
+    if(text.trim().startsWith("<")) return {ok:false,error:"Server error — try again"};
+    return JSON.parse(text);
+  }catch(e){return {ok:false,error:e.message};}
+}
+async function getSheet(name){
+  if(isFresh(name)) return CACHE[name];
+  const res=await GET({action:"read_"+name});
+  if(res.ok) setCache(name,res.rows);
+  return res.ok?res.rows:[];
+}
+async function getBatch(sheets){
+  const key="b_"+sheets.join(",");
+  if(isFresh(key)) return CACHE[key];
+  const res=await GET({action:"read_batch",sheets:sheets.join(",")});
+  if(res.ok) setCache(key,res);
+  return res;
+}
+
+function saveSession(u){try{sessionStorage.setItem("ktc_user",JSON.stringify(u));}catch(e){}}
+function loadSession(){try{const s=sessionStorage.getItem("ktc_user");return s?JSON.parse(s):null;}catch(e){return null;}}
+function clearSession(){try{sessionStorage.removeItem("ktc_user");}catch(e){}}
+
+/* LOGIN */
+document.getElementById("lBtn").addEventListener("click",doLogin);
+document.getElementById("lPass").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+window.addEventListener("load",()=>{const s=loadSession();if(s){USER=s;bootApp();}});
+
+async function doLogin(){
+  const btn=document.getElementById("lBtn"),err=document.getElementById("lErr");
+  const u=document.getElementById("lUser").value.trim(),p=document.getElementById("lPass").value;
+  if(!u||!p){showE(err,"Enter username and password.");return;}
+  btn.disabled=true;btn.textContent="Signing in…";err.classList.remove("show");
+  try{
+    const q=new URLSearchParams({action:"login",username:u,password:p});
+    const text=await (await fetch(URL_+"?"+q)).text();
+    if(text.trim().startsWith("<")){showE(err,"Server error. Try again.");btn.disabled=false;btn.textContent="Sign in";return;}
+    const data=JSON.parse(text);
+    if(data.ok){USER=data;USER.username=u;USER.password=p;saveSession(USER);bootApp();}
+    else showE(err,data.error||"Sign-in failed.");
+  }catch(e){showE(err,"Cannot connect. Check internet.");}
+  finally{btn.disabled=false;btn.textContent="Sign in";}
+}
+function showE(el,m){el.textContent=m;el.classList.add("show");}
+
+function bootApp(){
+  document.getElementById("loginWrap").style.display="none";
+  document.getElementById("appShell").classList.add("active");
+  document.getElementById("sbAv").textContent=initials(USER.name);
+  document.getElementById("sbName").textContent=USER.name;
+  document.getElementById("sbRole").innerHTML=`<span class="srrole sr-${USER.role}">${cap(USER.role)}</span>`;
+  const acc=USER.access||[];
+  document.querySelectorAll(".ni[data-acc]").forEach(ni=>{ni.style.display=acc.includes(ni.dataset.acc)?"flex":"none";});
+  document.querySelectorAll(".ni").forEach(ni=>ni.addEventListener("click",()=>navigate(ni.dataset.page)));
+  document.getElementById("soBtn").addEventListener("click",()=>{if(confirm("Sign out?")){clearSession();location.reload();}});
+  document.getElementById("cpBtn").addEventListener("click",openCPw);
+  document.getElementById("mClose").addEventListener("click",closeMod);
+  document.getElementById("mBg").addEventListener("click",e=>{if(e.target===document.getElementById("mBg")&&!window.getSelection().toString())closeMod();});
+  navigate("dashboard");
+}
+
+const PAGE_TITLES={dashboard:"Dashboard",assess:"My Assessments",students:"Students",semesters:"Semesters",sessions:"Assessment Sessions",staff:"Staff Accounts",reports:"Reports & Export"};
+
+function navigate(page){
+  if(!page) return;
+  document.querySelectorAll(".ni").forEach(n=>n.classList.toggle("active",n.dataset.page===page));
+  document.getElementById("pTitle").textContent=PAGE_TITLES[page]||page;
+  document.getElementById("tbr").innerHTML="";
+  ({dashboard:renderDashboard,assess:renderAssess,students:renderStudents,semesters:renderSemesters,sessions:renderSessions,staff:renderStaff,reports:renderReports}[page]||function(){set(`<div class="empty">Coming soon.</div>`);})();
+}
+function set(html){document.getElementById("pc").innerHTML=html;}
+function loading(){set(`<div class="loading"><div class="spinner"></div>Loading…</div>`);}
+
+/* ── DASHBOARD ── */
+async function renderDashboard(){
+  loading();
+  const isAdmin=["operator","admin"].includes(USER.role);
+  try{
+    const d=await getBatch(["students","sessions","scores","semesters"]);
+    const students=d.students||[],sessions=d.sessions||[],scores=d.scores||[],sems=d.semesters||[];
+    const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+    const semStudents=students.filter(s=>s.semester_id===activeSem.semester_code);
+    const openSessions=sessions.filter(s=>s.status==="open");
+    const myScores=scores.filter(s=>s.rater_id===USER.id||s.rater_name===USER.name);
+    if(isAdmin){
+      // Admin dashboard
+      const totalScored=new Set(scores.map(s=>s.student_id)).size;
+      set(`
+        <div style="background:var(--g);border-radius:var(--r);padding:1rem 1.2rem;margin-bottom:.8rem;color:#fff">
+          <div style="font-size:.72rem;color:rgba(255,255,255,.55);margin-bottom:.2rem">Active semester</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--gold)">${activeSem.label||activeSem.semester_code||"No active semester"}</div>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.15rem">Studies begin: ${activeSem.study_start_date||"—"} · Reporting: ${activeSem.reporting_start||"—"} to ${activeSem.reporting_end||"—"}</div>
+        </div>
+        <div class="kpis">
+          <div class="kpi gold"><div class="kpin">${semStudents.length}</div><div class="kpil">Students this semester</div></div>
+          <div class="kpi"><div class="kpin" style="color:var(--g)">${openSessions.length}</div><div class="kpil">Open sessions</div></div>
+          <div class="kpi"><div class="kpin" style="color:var(--g)">${totalScored}</div><div class="kpil">Students assessed</div></div>
+          <div class="kpi"><div class="kpin" style="color:var(--g)">${students.filter(s=>s.reporting_status==="Late").length}</div><div class="kpil">Late arrivals</div></div>
+        </div>
+        ${openSessions.length?`
+        <div class="panel">
+          <div class="pnt">Open assessment sessions</div>
+          ${openSessions.map(s=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--line)">
+              <div><div style="font-size:.82rem;font-weight:700;color:var(--g)">${s.label||s.session_id}</div>
+              <div style="font-size:.67rem;color:var(--muted)">Opened: ${s.opened_date||"—"} by ${s.opened_by||"—"}</div></div>
+              <div style="display:flex;gap:.35rem;align-items:center">
+                <span class="pill pg">Open</span>
+                <button class="btn bg bsm" onclick="viewSessionProgress('${s.session_id}')">Progress</button>
+              </div>
+            </div>`).join("")}
+        </div>`:""}
+        <div class="panel">
+          <div class="pnt">Recent registrations <span>latest 5</span></div>
+          ${semStudents.slice(-5).reverse().map(s=>`
+            <div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line)">
+              <div class="stav">${initials(s.full_name)}</div>
+              <div style="flex:1"><div style="font-size:.78rem;font-weight:600">${s.full_name}</div>
+              <div style="font-size:.65rem;color:var(--muted);font-family:monospace">${s.reg_no}</div></div>
+              <span class="pill ${s.reporting_status==="Late"?"po":"pg"}">${s.reporting_status||"On time"}</span>
+            </div>`).join("")||`<div class="empty" style="padding:1rem">No students registered yet.</div>`}
+        </div>
+      `);
+    } else {
+      // Rater dashboard
+      const pending=openSessions.filter(sess=>{
+        const mine=scores.filter(s=>s.session_id===sess.session_id&&(s.rater_id===USER.id||s.rater_name===USER.name));
+        return mine.length<semStudents.length;
+      });
+      set(`
+        <div style="background:var(--g);border-radius:var(--r);padding:1rem 1.2rem;margin-bottom:.8rem;color:#fff">
+          <div style="font-size:.72rem;color:rgba(255,255,255,.55);margin-bottom:.2rem">Active semester</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--gold)">${activeSem.label||activeSem.semester_code||"No active semester"}</div>
+        </div>
+        <div class="kpis">
+          <div class="kpi gold"><div class="kpin">${semStudents.length}</div><div class="kpil">Students to assess</div></div>
+          <div class="kpi"><div class="kpin" style="color:var(--g)">${myScores.length}</div><div class="kpil">My submissions</div></div>
+          <div class="kpi"><div class="kpin" style="color:${pending.length?'var(--err)':'var(--ok)'}">${pending.length}</div><div class="kpil">Sessions pending</div></div>
+        </div>
+        ${openSessions.length?`
+        <div class="panel">
+          <div class="pnt">Sessions requiring your assessment</div>
+          ${openSessions.map(sess=>{
+            const mine=scores.filter(s=>s.session_id===sess.session_id&&(s.rater_id===USER.id||s.rater_name===USER.name));
+            const pct=semStudents.length?Math.round(mine.length/semStudents.length*100):0;
+            return `<div style="padding:.55rem 0;border-bottom:1px solid var(--line)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
+                <div style="font-size:.82rem;font-weight:700;color:var(--g)">${sess.label||sess.session_id}</div>
+                <button class="btn bp bsm" onclick="navigate('assess')">Assess now</button>
+              </div>
+              <div style="font-size:.67rem;color:var(--muted);margin-bottom:.35rem">${mine.length} of ${semStudents.length} students scored (${pct}%)</div>
+              <div class="prog"><div class="progf" style="width:${pct}%"></div></div>
+            </div>`;
+          }).join("")||`<div class="empty" style="padding:1rem">No open sessions.</div>`}
+        </div>`:`<div class="panel"><div class="empty" style="padding:1.5rem">No open assessment sessions at this time.</div></div>`}
+      `);
+    }
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+/* ── MY ASSESSMENTS (Rater view) ── */
+async function renderAssess(){
+  loading();
+  try{
+    const d=await getBatch(["sessions","students","scores","semesters"]);
+    const sessions=d.sessions||[],students=d.students||[],scores=d.scores||[],sems=d.semesters||[];
+    const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+    const semStudents=students.filter(s=>s.semester_id===activeSem.semester_code);
+    const openSessions=sessions.filter(s=>s.status==="open");
+    window._semStudents=semStudents;window._scores=scores;window._openSessions=openSessions;
+    if(!openSessions.length){set(`<div class="empty">No open assessment sessions at this time.<br><span style="font-size:.78rem">Contact Admin to open a session.</span></div>`);return;}
+    set(`
+      <div class="panel" style="margin-bottom:.8rem">
+        <div class="pnt">Select session <span>${activeSem.label||activeSem.semester_code}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+          ${openSessions.map(s=>`<button class="btn ${window._activeSession===s.session_id?'bp':'bg'}" onclick="selectSession('${s.session_id}')" id="sbtn_${s.session_id.replace(/[^a-z0-9]/gi,'_')}">${s.label||s.session_id}</button>`).join("")}
+        </div>
+      </div>
+      <div id="assessContent"><div class="empty">Select a session above to begin scoring.</div></div>
+    `);
+    if(openSessions.length===1) selectSession(openSessions[0].session_id);
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function selectSession(sessionId){
+  window._activeSession=sessionId;
+  const students=window._semStudents||[];
+  const scores=window._scores||[];
+  const myScores=scores.filter(s=>s.session_id===sessionId&&(s.rater_id===USER.id||s.rater_name===USER.name));
+  const myScoreMap={};myScores.forEach(s=>{myScoreMap[s.student_id]=s;});
+  // Update button styles
+  document.querySelectorAll("[id^='sbtn_']").forEach(b=>{b.className="btn bg";});
+  const btn=document.getElementById("sbtn_"+sessionId.replace(/[^a-z0-9]/gi,"_"));
+  if(btn) btn.className="btn bp";
+  const el=document.getElementById("assessContent");
+  if(!el) return;
+  const session=window._openSessions?.find(s=>s.session_id===sessionId);
+  el.innerHTML=`
+    <div class="panel">
+      <div class="pnt">${session?.label||sessionId} <span>${myScores.length}/${students.length} scored</span></div>
+      <div class="sbar"><input type="text" id="assessQ" placeholder="Search student…" oninput="filterAssessStudents()"></div>
+      <div class="stg" id="assessGrid">${renderAssessCards(students,myScoreMap,sessionId)}</div>
+    </div>
+  `;
+  window._assessMap=myScoreMap;window._assessSession=sessionId;
+}
+
+function renderAssessCards(students,scoreMap,sessionId){
+  if(!students.length) return `<div class="empty" style="grid-column:1/-1">No students in this semester.</div>`;
+  return students.map(st=>{
+    const sc=scoreMap[st._id];
+    const status=sc?(sc.edited==="YES"?"Edited — final":"Submitted"):"Pending";
+    const statusClass=sc?(sc.edited==="YES"?"pb":"pg"):"po";
+    const avg=sc?Number(sc.overall_avg||0).toFixed(2):"—";
+    return `<div class="stcard" onclick="openScoreForm('${st._id}','${esc(st.full_name)}','${sessionId}')">
+      <div style="display:flex;align-items:center;gap:.65rem">
+        <div class="stav">${initials(st.full_name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.82rem;font-weight:700;color:var(--ink)">${st.full_name}</div>
+          <div style="font-size:.65rem;color:var(--muted);font-family:monospace">${st.reg_no}</div>
+          <div style="display:flex;gap:.3rem;margin-top:.3rem;align-items:center">
+            <span class="pill ${statusClass}">${status}</span>
+            ${sc?`<span style="font-size:.65rem;color:var(--muted)">Avg: <b style="color:var(--g)">${avg}</b></span>`:""}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function filterAssessStudents(){
+  const q=(document.getElementById("assessQ")?.value||"").toLowerCase();
+  const f=(window._semStudents||[]).filter(s=>(s.full_name||"").toLowerCase().includes(q)||(s.reg_no||"").includes(q));
+  const el=document.getElementById("assessGrid");
+  if(el) el.innerHTML=renderAssessCards(f,window._assessMap||{},window._assessSession||"");
+}
+
+function openScoreForm(studentId,studentName,sessionId){
+  const existing=(window._scores||[]).find(s=>s.session_id===sessionId&&s.student_id===studentId&&(s.rater_id===USER.id||s.rater_name===USER.name));
+  const isLocked=existing?.locked==="YES";
+  const isEdited=existing?.edited==="YES";
+  const canEdit=existing&&!isLocked&&!isEdited;
+  const isNew=!existing;
+  if(isLocked){openMod(studentName,"<div class='empty'>Scores are locked — session has been closed.</div>");return;}
+  openMod(`Score: ${studentName}`,`
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:.65rem">
+      Session: <b>${sessionId}</b> · Rater: <b>${USER.name}</b>
+      ${existing?`<span class="pill ${isEdited?"pb":"pg"}" style="margin-left:.4rem">${isEdited?"Edited — final":"Submitted"}</span>`:""}
+      ${existing&&!isEdited?`<div style="margin-top:.35rem;font-size:.68rem;color:var(--err)">⚠ You have <b>one edit</b> remaining. After editing, scores will be permanently locked.</div>`:""}
+      ${isEdited?`<div style="margin-top:.35rem;font-size:.68rem;color:var(--err)">🔒 You have used your edit. These scores are final and cannot be changed.</div>`:""}
+    </div>
+    <div class="score-grid">
+      ${CATS.map(cat=>{
+        const val=existing?Number(existing[cat.id]||0):0;
+        const comment=existing?existing[cat.id+"_comment"]||"":"";
+        return `<div class="score-row">
+          <div>
+            <div class="score-label">${cat.sw}</div>
+            <div class="score-sublabel">${cat.en}</div>
+          </div>
+          <div style="width:100%">
+            <select id="sc_${cat.id}" class="score-sel sc${val}" onchange="colorScore(this)" ${isEdited?"disabled":""}>
+              ${Object.entries(SCALE).map(([k,v])=>`<option value="${k}" ${Number(k)===val?"selected":""}>${v}</option>`).join("")}
+            </select>
+            <textarea id="sc_${cat.id}_comment" class="score-comment" placeholder="Comment (optional)…" ${isEdited?"disabled":""}>${comment}</textarea>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    ${!isEdited?`
+    <div class="fa">
+      <button class="btn bp" onclick="submitScores('${studentId}','${esc(studentName)}','${sessionId}',${canEdit})">${isNew?"Submit scores":canEdit?"Save edit":""}</button>
+      <button class="btn bg" onclick="closeMod()">Cancel</button>
+    </div>
+    <div class="msg" id="scoreMsg"></div>`:""}
+  `);
+}
+
+function colorScore(sel){
+  const n=Number(sel.value);
+  sel.className="score-sel sc"+n;
+}
+
+async function submitScores(studentId,studentName,sessionId,isEdit){
+  const msg=document.getElementById("scoreMsg");
+  const payload={session_id:sessionId,student_id:studentId,student_name:studentName,rater_id:USER.id,rater_name:USER.name};
+  CATS.forEach(cat=>{
+    payload[cat.id]=Number(document.getElementById("sc_"+cat.id)?.value||0);
+    payload[cat.id+"_comment"]=document.getElementById("sc_"+cat.id+"_comment")?.value.trim()||"";
+  });
+  const res=await POST({action:"submit_scores",payload});
+  if(res.ok){
+    clearCache();
+    showMsg(msg,"ok",isEdit?`Edit saved. Average: ${res.avg||"—"}/5. Scores now locked — no further edits.`:`Scores submitted. Average: ${res.avg||"—"}/5.`);
+    // Refresh scores cache
+    setTimeout(async()=>{
+      const d=await getBatch(["scores"]);
+      window._scores=d.scores||[];
+      const myScores=(window._scores||[]).filter(s=>s.session_id===sessionId&&(s.rater_id===USER.id||s.rater_name===USER.name));
+      const myScoreMap={};myScores.forEach(s=>{myScoreMap[s.student_id]=s;});
+      window._assessMap=myScoreMap;
+      const el=document.getElementById("assessGrid");
+      if(el) el.innerHTML=renderAssessCards(window._semStudents||[],myScoreMap,sessionId);
+      closeMod();
+    },1200);
+  } else showMsg(msg,"err",res.error||"Failed.");
+}
+
+/* ── STUDENTS ── */
+async function renderStudents(){
+  loading();
+  const canEdit=["operator","admin"].includes(USER.role);
+  try{
+    const [students,sems]=await Promise.all([getSheet("students"),getSheet("semesters")]);
+    window._students=students;window._sems=sems;
+    const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+    const semStudents=students.filter(s=>s.semester_id===activeSem.semester_code);
+    document.getElementById("tbr").innerHTML=`<span class="pill pb">${semStudents.length} in active semester</span>`;
+    set(`
+      ${canEdit?`<div style="display:flex;gap:.5rem;margin-bottom:.8rem;flex-wrap:wrap">
+        <button class="btn bp" onclick="openAddStudent()">+ Register student</button>
+        ${!semStudents.length&&activeSem.semester_code?`<button class="btn bg" onclick="importSem2Students('${activeSem.semester_code}')">⬆ Import SEM 2 — 2026 students (${SEM2_STUDENTS.length})</button>`:""}
+      </div>`:""}
+      <div class="sbar">
+        <input type="text" id="stuQ" placeholder="Search by name or reg no…" oninput="filterStudents()">
+        <select id="stuSem" onchange="filterStudents()">
+          <option value="">All semesters</option>
+          ${sems.map(s=>`<option value="${s.semester_code}" ${s.semester_code===activeSem.semester_code?"selected":""}>${s.label||s.semester_code}</option>`).join("")}
+        </select>
+        <select id="stuStatus" onchange="filterStudents()"><option value="">All status</option><option value="active">Active</option><option value="late">Late arrivals</option></select>
+      </div>
+      <div class="stg" id="stuGrid">${renderStudentCards(semStudents.length?semStudents:students.slice(-36))}</div>
+    `);
+    window._filterStudents=students;
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function renderStudentCards(rows){
+  if(!rows.length) return `<div class="empty" style="grid-column:1/-1">No students found.</div>`;
+  return rows.map(s=>`
+    <div class="stcard" onclick="openStudentDetail('${s._id}')">
+      <div style="display:flex;align-items:center;gap:.65rem">
+        <div class="stav">${initials(s.full_name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.82rem;font-weight:700;color:var(--ink)">${s.full_name}</div>
+          <div style="font-size:.65rem;color:var(--muted);font-family:monospace">${s.reg_no}</div>
+          <div style="font-size:.65rem;color:var(--muted)">${s.gender||"—"} · ${s.nationality||"—"}</div>
+          <div style="display:flex;gap:.3rem;margin-top:.3rem;flex-wrap:wrap">
+            <span class="pill ${s.status==="active"?"pg":"po"}">${cap(s.status||"active")}</span>
+            ${s.reporting_status==="Late"?`<span class="pill po">Late arrival</span>`:""}
+            ${s.semester_id?`<span class="pill pb">${s.semester_id}</span>`:""}
+          </div>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function filterStudents(){
+  const q=(document.getElementById("stuQ")?.value||"").toLowerCase();
+  const sem=document.getElementById("stuSem")?.value||"";
+  const status=document.getElementById("stuStatus")?.value||"";
+  const f=(window._filterStudents||[]).filter(s=>{
+    const m=(s.full_name||"").toLowerCase().includes(q)||(s.reg_no||"").includes(q);
+    const sm=!sem||s.semester_id===sem;
+    const st=!status||(status==="late"?s.reporting_status==="Late":s.status===status);
+    return m&&sm&&st;
+  });
+  document.getElementById("stuGrid").innerHTML=renderStudentCards(f);
+}
+
+async function importSem2Students(semCode){
+  if(!confirm(`Import ${SEM2_STUDENTS.length} SEM 2 — 2026 students?\nThey will be registered as Active with basic info. You can edit details later.`)) return;
+  document.getElementById("tbr").innerHTML=`<span class="pill po">Importing…</span>`;
+  let done=0;
+  for(const name of SEM2_STUDENTS){
+    await POST({action:"add_student",payload:{full_name:name,semester_code:semCode,semester_id:semCode,gender:"",nationality:"",reporting_date:"",status:"active"}});
+    done++;
+    document.getElementById("tbr").innerHTML=`<span class="pill po">Importing ${done}/${SEM2_STUDENTS.length}…</span>`;
+  }
+  clearCache();
+  document.getElementById("tbr").innerHTML=`<span class="pill pg">${done} imported</span>`;
+  setTimeout(()=>renderStudents(),1000);
+}
+
+function openAddStudent(){
+  const sems=window._sems||[];
+  const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+  openMod("Register student",`
+    <div class="tabs">
+      <div class="tab active" onclick="swTab(this,'st-p')">Personal</div>
+      <div class="tab" onclick="swTab(this,'st-c')">Contact</div>
+      <div class="tab" onclick="swTab(this,'st-ch')">Church / Sponsor</div>
+    </div>
+    <div class="tpanel active" id="st-p">
+      <div class="fg">
+        <div class="field full"><label>Full name *</label><input type="text" id="stN" placeholder="Full name"></div>
+        <div class="field"><label>Gender</label><select id="stG"><option value="">—</option><option>Male</option><option>Female</option></select></div>
+        <div class="field"><label>Date of birth</label><input type="date" id="stDob"></div>
+        <div class="field"><label>Nationality *</label>
+          <input type="text" id="stNat" list="natList" placeholder="Start typing…">
+          <datalist id="natList">${NATIONALITIES.map(n=>`<option value="${n}">`).join("")}</datalist>
+          <div class="hint">Tanzania appears first — not pre-selected</div>
+        </div>
+        <div class="field"><label>Tribe / Kabila</label><input type="text" id="stTribe" placeholder="e.g. Hehe"></div>
+        <div class="field"><label>Religion / Dini</label><input type="text" id="stRel" placeholder="e.g. SDA"></div>
+        <div class="field"><label>Marital status</label><select id="stMar"><option value="">—</option><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option></select></div>
+        <div class="field"><label>Reporting date *</label><input type="date" id="stRd"><div class="hint">Actual date student arrived on campus</div></div>
+        <div class="field"><label>Semester</label><input type="text" id="stSem" value="${activeSem.semester_code||""}" readonly style="background:var(--tint);font-family:monospace"></div>
+      </div>
+    </div>
+    <div class="tpanel" id="st-c">
+      <div class="fg">
+        <div class="field"><label>Region</label><select id="stReg"><option value="">—</option>${TZ_REGIONS.map(r=>`<option>${r}</option>`).join("")}</select></div>
+        <div class="field"><label>District</label><input type="text" id="stDist" placeholder="District"></div>
+        <div class="field"><label>Street / Village</label><input type="text" id="stStr" placeholder="Street or village"></div>
+        <div class="field"><label>Phone *</label><input type="text" id="stPhone" placeholder="+255 7xx xxx xxx"></div>
+        <div class="field"><label>Email</label><input type="email" id="stEmail" placeholder="email@example.com"></div>
+        <div class="field full"><label>Emergency contact name</label><input type="text" id="stEmN" placeholder="Full name"></div>
+        <div class="field"><label>Relationship</label><input type="text" id="stEmR" placeholder="e.g. Parent, Spouse"></div>
+        <div class="field"><label>Emergency phone</label><input type="text" id="stEmP" placeholder="+255 7xx xxx xxx"></div>
+      </div>
+    </div>
+    <div class="tpanel" id="st-ch">
+      <div class="fg">
+        <div class="field full"><label>Sponsoring church</label><input type="text" id="stChurch" placeholder="Church name"></div>
+        <div class="field full"><label>Sending pastor</label><input type="text" id="stPastor" placeholder="Pastor full name"></div>
+        <div class="field full"><label>Church district / conference</label><input type="text" id="stChDist" placeholder="District or conference"></div>
+      </div>
+    </div>
+    <div class="fa">
+      <button class="btn bp" onclick="submitStudent()">Register student</button>
+      <button class="btn bg" onclick="closeMod()">Cancel</button>
+    </div>
+    <div class="msg" id="stMsg"></div>
+  `);
+}
+
+async function submitStudent(){
+  const msg=document.getElementById("stMsg");
+  if(!v("stN")){showMsg(msg,"err","Full name is required.");return;}
+  const sems=window._sems||[];
+  const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+  const payload={full_name:v("stN"),gender:v("stG"),dob:v("stDob"),nationality:v("stNat"),tribe:v("stTribe"),religion:v("stRel"),marital_status:v("stMar"),reporting_date:v("stRd"),semester_code:activeSem.semester_code||"",semester_id:activeSem.semester_code||"",region:v("stReg"),district:v("stDist"),street:v("stStr"),phone:v("stPhone"),email:v("stEmail"),emergency_name:v("stEmN"),emergency_relation:v("stEmR"),emergency_phone:v("stEmP"),church:v("stChurch"),pastor:v("stPastor"),church_district:v("stChDist")};
+  const res=await POST({action:"add_student",payload});
+  if(res.ok){clearCache();showMsg(msg,"ok",`Registered! ${res.reg_no} — ${res.reporting_status}`);setTimeout(()=>{closeMod();renderStudents();},1500);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+function openStudentDetail(id){
+  const st=(window._students||[]).find(s=>s._id===id);
+  if(!st) return;
+  const canEdit=["operator","admin"].includes(USER.role);
+  openMod(st.full_name,`
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
+      <span class="pill pb">${st.reg_no}</span>
+      <span class="pill ${st.status==="active"?"pg":"po"}">${cap(st.status||"active")}</span>
+      ${st.reporting_status==="Late"?`<span class="pill po">Late arrival</span>`:`<span class="pill pg">On time</span>`}
+      <span class="pill pp">${st.semester_id||"—"}</span>
+      ${canEdit?`<button class="btn bg bsm" style="margin-left:auto" onclick="openEditStudent('${id}')">✏️ Edit</button>`:""}
+    </div>
+    <div class="fg" style="font-size:.76rem">
+      <div><span style="color:var(--muted)">Gender:</span> ${st.gender||"—"}</div>
+      <div><span style="color:var(--muted)">Nationality:</span> ${st.nationality||"—"}</div>
+      <div><span style="color:var(--muted)">DOB:</span> ${st.dob||"—"}</div>
+      <div><span style="color:var(--muted)">Religion:</span> ${st.religion||"—"}</div>
+      <div><span style="color:var(--muted)">Tribe:</span> ${st.tribe||"—"}</div>
+      <div><span style="color:var(--muted)">Marital:</span> ${st.marital_status||"—"}</div>
+      <div><span style="color:var(--muted)">Phone:</span> ${st.phone||"—"}</div>
+      <div><span style="color:var(--muted)">Email:</span> ${st.email||"—"}</div>
+      <div class="full"><span style="color:var(--muted)">Address:</span> ${[st.street,st.district,st.region].filter(Boolean).join(", ")||"—"}</div>
+      <div class="full"><span style="color:var(--muted)">Emergency:</span> ${st.emergency_name||"—"} (${st.emergency_relation||"—"}) ${st.emergency_phone||""}</div>
+      <div class="full"><span style="color:var(--muted)">Church:</span> ${st.church||"—"} · ${st.pastor||"—"} · ${st.church_district||"—"}</div>
+      <div><span style="color:var(--muted)">Reported:</span> ${st.reporting_date||"—"}</div>
+      <div><span style="color:var(--muted)">Registered by:</span> ${st.registered_by||"—"}</div>
+    </div>
+  `);
+}
+
+function openEditStudent(id){
+  const st=(window._students||[]).find(s=>s._id===id);
+  if(!st) return;
+  openMod("Edit — "+st.full_name,`
+    <div class="tabs">
+      <div class="tab active" onclick="swTab(this,'est-p')">Personal</div>
+      <div class="tab" onclick="swTab(this,'est-c')">Contact</div>
+      <div class="tab" onclick="swTab(this,'est-ch')">Church</div>
+    </div>
+    <div class="tpanel active" id="est-p">
+      <div class="fg">
+        <div class="field full"><label>Full name *</label><input type="text" id="estN" value="${esc(st.full_name||"")}"></div>
+        <div class="field"><label>Gender</label><select id="estG"><option value="">—</option>${["Male","Female"].map(g=>`<option ${st.gender===g?"selected":""}>${g}</option>`).join("")}</select></div>
+        <div class="field"><label>Date of birth</label><input type="date" id="estDob" value="${st.dob||""}"></div>
+        <div class="field"><label>Nationality</label><input type="text" id="estNat" list="natList2" value="${esc(st.nationality||"")}"><datalist id="natList2">${NATIONALITIES.map(n=>`<option value="${n}">`).join("")}</datalist></div>
+        <div class="field"><label>Tribe</label><input type="text" id="estTribe" value="${esc(st.tribe||"")}"></div>
+        <div class="field"><label>Religion</label><input type="text" id="estRel" value="${esc(st.religion||"")}"></div>
+        <div class="field"><label>Marital status</label><select id="estMar"><option value="">—</option>${["Single","Married","Widowed","Divorced"].map(m=>`<option ${st.marital_status===m?"selected":""}>${m}</option>`).join("")}</select></div>
+        <div class="field"><label>Reporting date</label><input type="date" id="estRd" value="${st.reporting_date||""}"></div>
+        <div class="field"><label>Status</label><select id="estStatus"><option value="active" ${st.status==="active"?"selected":""}>Active</option><option value="graduated" ${st.status==="graduated"?"selected":""}>Graduated</option><option value="dropped" ${st.status==="dropped"?"selected":""}>Dropped</option><option value="suspended" ${st.status==="suspended"?"selected":""}>Suspended</option></select></div>
+      </div>
+    </div>
+    <div class="tpanel" id="est-c">
+      <div class="fg">
+        <div class="field"><label>Region</label><select id="estReg"><option value="">—</option>${TZ_REGIONS.map(r=>`<option ${st.region===r?"selected":""}>${r}</option>`).join("")}</select></div>
+        <div class="field"><label>District</label><input type="text" id="estDist" value="${esc(st.district||"")}"></div>
+        <div class="field"><label>Street</label><input type="text" id="estStr" value="${esc(st.street||"")}"></div>
+        <div class="field"><label>Phone</label><input type="text" id="estPhone" value="${esc(st.phone||"")}"></div>
+        <div class="field"><label>Email</label><input type="email" id="estEmail" value="${esc(st.email||"")}"></div>
+        <div class="field full"><label>Emergency name</label><input type="text" id="estEmN" value="${esc(st.emergency_name||"")}"></div>
+        <div class="field"><label>Relationship</label><input type="text" id="estEmR" value="${esc(st.emergency_relation||"")}"></div>
+        <div class="field"><label>Emergency phone</label><input type="text" id="estEmP" value="${esc(st.emergency_phone||"")}"></div>
+      </div>
+    </div>
+    <div class="tpanel" id="est-ch">
+      <div class="fg">
+        <div class="field full"><label>Sponsoring church</label><input type="text" id="estChurch" value="${esc(st.church||"")}"></div>
+        <div class="field full"><label>Sending pastor</label><input type="text" id="estPastor" value="${esc(st.pastor||"")}"></div>
+        <div class="field full"><label>Church district</label><input type="text" id="estChDist" value="${esc(st.church_district||"")}"></div>
+      </div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitEditStudent('${id}')">Save changes</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="estMsg"></div>
+  `);
+}
+
+async function submitEditStudent(id){
+  const msg=document.getElementById("estMsg");
+  if(!v("estN")){showMsg(msg,"err","Full name required.");return;}
+  const payload={_id:id,full_name:v("estN"),gender:v("estG"),dob:v("estDob"),nationality:v("estNat"),tribe:v("estTribe"),religion:v("estRel"),marital_status:v("estMar"),reporting_date:v("estRd"),status:v("estStatus"),region:v("estReg"),district:v("estDist"),street:v("estStr"),phone:v("estPhone"),email:v("estEmail"),emergency_name:v("estEmN"),emergency_relation:v("estEmR"),emergency_phone:v("estEmP"),church:v("estChurch"),pastor:v("estPastor"),church_district:v("estChDist")};
+  const res=await POST({action:"update_student",payload});
+  if(res.ok){clearCache();showMsg(msg,"ok","Student updated.");setTimeout(()=>{closeMod();renderStudents();},1000);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+/* ── SEMESTERS ── */
+async function renderSemesters(){
+  loading();
+  const canEdit=["operator","admin"].includes(USER.role);
+  try{
+    const rows=await getSheet("semesters");
+    window._sems=rows;
+    set(`
+      ${canEdit?`<button class="btn bp" style="margin-bottom:.8rem" onclick="openAddSemester()">+ Add semester</button>`:""}
+      <div class="panel">
+        <div class="pnt">Semesters</div>
+        <div class="tw"><table>
+          <thead><tr><th>Code</th><th>Label</th><th>Year</th><th>Sem</th><th>Study starts</th><th>Reporting from</th><th>Reporting to</th><th>Status</th><th></th></tr></thead>
+          <tbody>${rows.length?rows.slice().reverse().map(s=>`<tr>
+            <td style="font-family:monospace">${s.semester_code||"—"}</td>
+            <td><b>${s.label||"—"}</b></td>
+            <td>${s.year||"—"}</td>
+            <td>${s.sem_number||"—"}</td>
+            <td>${s.study_start_date||"—"}</td>
+            <td>${s.reporting_start||"—"}</td>
+            <td>${s.reporting_end||"—"}</td>
+            <td><span class="pill ${s.status==="active"?"pg":"pb"}">${cap(s.status||"active")}</span></td>
+            <td>${canEdit?`<button class="btn bg bsm" onclick="openEditSem('${s._id}')">Edit</button>`:""}</td>
+          </tr>`).join(""):`<tr><td colspan="9" style="text-align:center;color:var(--muted)">No semesters yet.</td></tr>`}
+          </tbody>
+        </table></div>
+      </div>
+    `);
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function openAddSemester(){
+  openMod("Add semester",`
+    <div class="fg">
+      <div class="field"><label>Year *</label><input type="number" id="semY" value="${new Date().getFullYear()}"></div>
+      <div class="field"><label>Semester number *</label><select id="semN"><option value="1">SEM 1 (Jan–Jun)</option><option value="2">SEM 2 (Jul–Dec)</option></select></div>
+      <div class="field full"><label>Label / Display name *</label><input type="text" id="semL" placeholder="e.g. SEM 2 — 2026 (July–December)"></div>
+      <div class="field"><label>Study start date *</label><input type="date" id="semSS"></div>
+      <div class="field"><label>Reporting window opens</label><input type="date" id="semRS"><div class="hint">2 weeks before studies begin</div></div>
+      <div class="field"><label>Reporting window closes</label><input type="date" id="semRE"><div class="hint">Last day to arrive on time</div></div>
+      <div class="field"><label>Status</label><select id="semSt"><option value="active">Active</option><option value="closed">Closed</option></select></div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitSemester()">Save semester</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="semMsg"></div>
+  `);
+}
+
+async function submitSemester(){
+  const msg=document.getElementById("semMsg");
+  if(!v("semY")||!v("semL")){showMsg(msg,"err","Year and label required.");return;}
+  const res=await POST({action:"add_semester",payload:{year:v("semY"),sem_number:v("semN"),label:v("semL"),study_start_date:v("semSS"),reporting_start:v("semRS"),reporting_end:v("semRE"),status:v("semSt")}});
+  if(res.ok){clearCache();showMsg(msg,"ok","Semester added: "+res.semester_code);setTimeout(()=>{closeMod();renderSemesters();},1200);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+function openEditSem(id){
+  const s=(window._sems||[]).find(x=>x._id===id);if(!s) return;
+  openMod("Edit semester — "+s.label,`
+    <div class="fg">
+      <div class="field full"><label>Label</label><input type="text" id="esL" value="${esc(s.label||"")}"></div>
+      <div class="field"><label>Study start date</label><input type="date" id="esSS" value="${s.study_start_date||""}"></div>
+      <div class="field"><label>Reporting opens</label><input type="date" id="esRS" value="${s.reporting_start||""}"></div>
+      <div class="field"><label>Reporting closes</label><input type="date" id="esRE" value="${s.reporting_end||""}"></div>
+      <div class="field"><label>Status</label><select id="esSt"><option value="active" ${s.status==="active"?"selected":""}>Active</option><option value="closed" ${s.status==="closed"?"selected":""}>Closed</option></select></div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitEditSem('${id}')">Save</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="esMsg"></div>
+  `);
+}
+
+async function submitEditSem(id){
+  const msg=document.getElementById("esMsg");
+  const res=await POST({action:"update_semester",payload:{_id:id,label:v("esL"),study_start_date:v("esSS"),reporting_start:v("esRS"),reporting_end:v("esRE"),status:v("esSt")}});
+  if(res.ok){clearCache();showMsg(msg,"ok","Updated.");setTimeout(()=>{closeMod();renderSemesters();},1000);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+/* ── SESSIONS ── */
+async function renderSessions(){
+  loading();
+  const canEdit=["operator","admin"].includes(USER.role);
+  try{
+    const [sessions,sems,students,scores]=await Promise.all([getSheet("sessions"),getSheet("semesters"),getSheet("students"),getSheet("scores")]);
+    window._sessions=sessions;window._sems=sems;
+    const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+    set(`
+      ${canEdit?`<button class="btn bp" style="margin-bottom:.8rem" onclick="openAddSession()">+ Open assessment session</button>`:""}
+      <div class="panel">
+        <div class="pnt">Assessment sessions</div>
+        <div class="tw"><table>
+          <thead><tr><th>Session ID</th><th>Semester</th><th>Type</th><th>Label</th><th>Status</th><th>Opened</th><th>Closed</th><th>Progress</th><th></th></tr></thead>
+          <tbody>${sessions.length?sessions.slice().reverse().map(s=>{
+            const semStudents=students.filter(st=>st.semester_id===s.semester_id);
+            const sesScores=scores.filter(sc=>sc.session_id===s.session_id);
+            const raters=[...new Set(sesScores.map(sc=>sc.rater_name))].length;
+            const studentsScored=[...new Set(sesScores.map(sc=>sc.student_id))].length;
+            return `<tr>
+              <td style="font-family:monospace;font-size:.7rem">${s.session_id}</td>
+              <td>${s.semester_id||"—"}</td>
+              <td>${s.assessment_type||"—"}</td>
+              <td><b>${s.label||"—"}</b></td>
+              <td><span class="pill ${s.status==="open"?"pg":"pr"}">${cap(s.status)}</span></td>
+              <td style="font-size:.7rem">${s.opened_date||"—"}</td>
+              <td style="font-size:.7rem">${s.closed_date||"—"}</td>
+              <td><div style="font-size:.7rem">${studentsScored}/${semStudents.length} students · ${raters} raters</div><div class="prog" style="width:100px"><div class="progf" style="width:${semStudents.length?Math.round(studentsScored/semStudents.length*100):0}%"></div></div></td>
+              <td><div style="display:flex;gap:.25rem">
+                <button class="btn bg bsm" onclick="viewSessionProgress('${s.session_id}')">View</button>
+                ${canEdit&&s.status==="open"?`<button class="btn bd bsm" onclick="closeSession('${s.session_id}')">Close</button>`:""}
+              </div></td>
+            </tr>`;
+          }).join(""):`<tr><td colspan="9" style="text-align:center;color:var(--muted)">No sessions yet.</td></tr>`}
+          </tbody>
+        </table></div>
+      </div>
+    `);
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function openAddSession(){
+  const sems=window._sems||[];
+  const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+  openMod("Open assessment session",`
+    <div class="fg">
+      <div class="field full"><label>Semester</label><input type="text" value="${activeSem.label||activeSem.semester_code||"—"}" readonly style="background:var(--tint)"></div>
+      <div class="field"><label>Assessment type *</label>
+        <select id="sesType">
+          <option value="FIRST">First General Assessment</option>
+          <option value="SECOND">Second General Assessment</option>
+        </select>
+      </div>
+      <div class="field full"><label>Label *</label><input type="text" id="sesLabel" placeholder="e.g. First General Assessment — SEM 2 2026"><div class="hint">Displayed to raters when they log in</div></div>
+    </div>
+    <div style="margin-top:.65rem;padding:.6rem .75rem;background:#faeeda;border-radius:8px;font-size:.75rem;color:#633806">
+      ⚠ Opening a session immediately makes it visible to all raters. Ensure all students are registered before opening.
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitSession()">Open session</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="sesMsg"></div>
+  `);
+}
+
+async function submitSession(){
+  const msg=document.getElementById("sesMsg");
+  const sems=window._sems||[];
+  const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+  if(!v("sesLabel")){showMsg(msg,"err","Label is required.");return;}
+  const res=await POST({action:"open_session",payload:{semester_id:activeSem.semester_code||"",assessment_type:v("sesType"),label:v("sesLabel")}});
+  if(res.ok){clearCache();showMsg(msg,"ok","Session opened: "+res.session_id);setTimeout(()=>{closeMod();renderSessions();},1200);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+async function closeSession(sessionId){
+  if(!confirm(`Close session "${sessionId}"?\nAll remaining scores will be locked. This cannot be undone.`)) return;
+  const res=await POST({action:"close_session",payload:{session_id:sessionId}});
+  if(res.ok){clearCache();renderSessions();}
+  else alert(res.error||"Failed.");
+}
+
+async function viewSessionProgress(sessionId){
+  openMod("Session progress — "+sessionId,"<div class='loading'><div class='spinner'></div>Loading…</div>");
+  const res=await GET({action:"get_scores_by_session",session_id:sessionId});
+  const sems=window._sems||await getSheet("semesters");
+  const students=window._students||await getSheet("students");
+  const session=(window._sessions||[]).find(s=>s.session_id===sessionId)||{};
+  const semStudents=students.filter(s=>s.semester_id===session.semester_id);
+  if(!res.ok){document.getElementById("mBody").innerHTML=`<div class="empty">${res.error}</div>`;return;}
+  const scores=res.scores||[];
+  const raterMap={};
+  scores.forEach(s=>{
+    if(!raterMap[s.rater_name]) raterMap[s.rater_name]={name:s.rater_name,scores:[],edited:0};
+    raterMap[s.rater_name].scores.push(s);
+    if(s.edited==="YES") raterMap[s.rater_name].edited++;
+  });
+  const studentsScored=[...new Set(scores.map(s=>s.student_id))].length;
+  document.getElementById("mBox").classList.add("wide");
+  document.getElementById("mBody").innerHTML=`
+    <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:.75rem">
+      <div class="kpi gold"><div class="kpin">${semStudents.length}</div><div class="kpil">Total students</div></div>
+      <div class="kpi"><div class="kpin" style="color:var(--g)">${studentsScored}</div><div class="kpil">Students scored</div></div>
+      <div class="kpi"><div class="kpin" style="color:var(--g)">${Object.keys(raterMap).length}</div><div class="kpil">Raters submitted</div></div>
+    </div>
+    <div class="pnt" style="margin-bottom:.5rem">Rater submission status</div>
+    <div class="rater-status" style="margin-bottom:.85rem">
+      ${Object.values(raterMap).map(r=>`<span class="rs ${r.edited>0?"rs-edited":"rs-done"}">${r.name} — ${r.scores.length} students${r.edited>0?" (edited)":""}</span>`).join("")}
+    </div>
+    <div class="pnt" style="margin-bottom:.5rem">Student averages across all raters</div>
+    <div class="tw"><table>
+      <thead><tr><th>Student</th><th>Reg No</th>${CATS.map(c=>`<th>${c.sw.split(" ")[0]}</th>`).join("")}<th>Overall avg</th></tr></thead>
+      <tbody>${semStudents.map(st=>{
+        const stScores=scores.filter(s=>s.student_id===st._id);
+        if(!stScores.length) return `<tr><td>${st.full_name}</td><td style="font-family:monospace">${st.reg_no}</td>${CATS.map(()=>`<td style="text-align:center;color:var(--muted)">—</td>`).join("")}<td style="text-align:center;color:var(--muted)">—</td></tr>`;
+        const catAvgs=CATS.map(cat=>{
+          const vals=stScores.map(s=>Number(s[cat.id]||0)).filter(n=>!isNaN(n));
+          return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):"—";
+        });
+        const overall=(catAvgs.filter(a=>a!=="—").reduce((a,b)=>a+Number(b),0)/catAvgs.filter(a=>a!=="—").length).toFixed(2);
+        return `<tr><td>${st.full_name}</td><td style="font-family:monospace">${st.reg_no}</td>${catAvgs.map(a=>`<td class="r" style="font-size:.72rem">${a}</td>`).join("")}<td class="r"><b style="color:var(--g)">${overall}</b></td></tr>`;
+      }).join("")}
+      </tbody>
+    </table></div>
+  `;
+}
+
+/* ── STAFF ── */
+async function renderStaff(){
+  loading();
+  try{
+    const rows=await GET({action:"read_staff"});
+    const staff=rows.rows||[];window._staff=staff;
+    const active=staff.filter(r=>r.status==="active").length;
+    document.getElementById("tbr").innerHTML=`<span class="pill pg">${active} active</span>`;
+    set(`
+      <button class="btn bp" style="margin-bottom:.8rem" onclick="openAddStaff()">+ Add staff account</button>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.65rem">
+        ${staff.map(s=>`
+          <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:.85rem">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--g);display:grid;place-items:center;font-size:.7rem;font-weight:800;flex:0 0 auto">${initials(s.name)}</div>
+              <div><div style="font-size:.8rem;font-weight:700">${s.name||"—"}</div><div style="font-size:.63rem;color:var(--muted)">@${s.username||"—"}</div></div>
+            </div>
+            <div style="margin-bottom:.45rem"><span class="srrole sr-${s.role||"rater"}">${cap(s.role||"rater")}</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.62rem;padding:2px 6px;border-radius:99px;font-weight:600;${s.status==="active"?"background:#e1f5ee;color:#085041":"background:#fbe8e8;color:#8c2828"}">${cap(s.status||"active")}</span>
+              <div style="display:flex;gap:.25rem">
+                <button style="font-size:.63rem;padding:2px 7px;border-radius:5px;border:1px solid var(--line);background:var(--card);color:var(--g);cursor:pointer" onclick="openEditStaff('${s._id}')">Edit</button>
+                ${s.status==="active"?`<button style="font-size:.63rem;padding:2px 7px;border-radius:5px;border:1px solid #eec3c3;background:#fbe8e8;color:var(--err);cursor:pointer" onclick="toggleStaff('${s._id}','${esc(s.name)}','revoked')">Revoke</button>`:`<button style="font-size:.63rem;padding:2px 7px;border-radius:5px;border:1px solid var(--line);background:var(--card);color:var(--g);cursor:pointer" onclick="toggleStaff('${s._id}','${esc(s.name)}','active')">Restore</button>`}
+              </div>
+            </div>
+          </div>`).join("")||`<div class="empty" style="grid-column:1/-1">No staff accounts yet.</div>`}
+      </div>
+    `);
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function openAddStaff(){
+  openMod("Add staff account",`
+    <div class="fg">
+      <div class="field full"><label>Full name *</label><input type="text" id="sfN" placeholder="Full name"></div>
+      <div class="field"><label>Username *</label><input type="text" id="sfU" placeholder="e.g. mfilinge"><div class="hint">Not case-sensitive at login</div></div>
+      <div class="field"><label>Password *</label><input type="text" id="sfP" placeholder="Set a password"><div class="hint">Case-sensitive</div></div>
+      <div class="field"><label>Role *</label><select id="sfR"><option value="rater">Rater (Teacher)</option><option value="admin">Admin</option></select></div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitStaff()">Create account</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="sfMsg"></div>
+  `);
+}
+
+async function submitStaff(){
+  const msg=document.getElementById("sfMsg");
+  if(!v("sfN")||!v("sfU")||!v("sfP")){showMsg(msg,"err","Name, username and password required.");return;}
+  const res=await POST({action:"add_staff",payload:{name:v("sfN"),username:v("sfU"),password:v("sfP"),role:v("sfR")}});
+  if(res.ok){showMsg(msg,"ok","Account created.");setTimeout(()=>{closeMod();renderStaff();},1200);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+function openEditStaff(id){
+  const s=(window._staff||[]).find(r=>r._id===id);if(!s) return;
+  openMod("Edit — "+s.name,`
+    <div class="fg">
+      <div class="field full"><label>Full name</label><input type="text" id="esfN" value="${esc(s.name||"")}"></div>
+      <div class="field"><label>Username</label><input type="text" id="esfU" value="${esc(s.username||"")}"></div>
+      <div class="field"><label>New password (blank = keep)</label><input type="text" id="esfP" placeholder="Leave blank to keep"></div>
+      <div class="field"><label>Role</label><select id="esfR"><option value="rater" ${s.role==="rater"?"selected":""}>Rater</option><option value="admin" ${s.role==="admin"?"selected":""}>Admin</option></select></div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitEditStaff('${id}')">Save</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="esfMsg"></div>
+  `);
+}
+
+async function submitEditStaff(id){
+  const msg=document.getElementById("esfMsg");
+  const payload={_id:id,name:v("esfN"),username:v("esfU"),role:v("esfR")};
+  if(v("esfP")) payload.password=v("esfP");
+  const res=await POST({action:"update_staff",payload});
+  if(res.ok){showMsg(msg,"ok","Updated.");setTimeout(()=>{closeMod();renderStaff();},1200);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+async function toggleStaff(id,name,status){
+  if(!confirm(`${status==="revoked"?"Revoke":"Restore"} account for ${name}?`)) return;
+  const res=await POST({action:"update_staff",payload:{_id:id,status}});
+  if(res.ok) renderStaff();else alert(res.error||"Failed.");
+}
+
+/* ── REPORTS ── */
+async function renderReports(){
+  loading();
+  if(!["operator","admin"].includes(USER.role)){set(`<div class="empty">Reports are restricted to Admin and Operator.</div>`);return;}
+  try{
+    const d=await getBatch(["students","sessions","scores","semesters"]);
+    const students=d.students||[],sessions=d.sessions||[],scores=d.scores||[],sems=d.semesters||[];
+    const activeSem=sems.find(s=>s.status==="active")||sems[sems.length-1]||{};
+    const semStudents=students.filter(s=>s.semester_id===activeSem.semester_code);
+    const semSessions=sessions.filter(s=>s.semester_id===activeSem.semester_code);
+    set(`
+      <div class="panel" style="margin-bottom:.8rem">
+        <div class="pnt">Export data — ${activeSem.label||activeSem.semester_code||"Active semester"}</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="btn bg" onclick="exportStudentsCSV()">⬇ Students CSV</button>
+          <button class="btn bg" onclick="exportScoresCSV()">⬇ All scores CSV</button>
+          <button class="btn bg" onclick="exportClassSummary()">⬇ Class summary CSV</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="pnt">Class score summary <span>${activeSem.label||"—"}</span></div>
+        <div class="sbar">
+          <select id="repSession" onchange="renderRepTable()">
+            <option value="">All sessions combined</option>
+            ${semSessions.map(s=>`<option value="${s.session_id}">${s.label||s.session_id}</option>`).join("")}
+          </select>
+        </div>
+        <div id="repTable"></div>
+      </div>
+    `);
+    window._repStudents=semStudents;window._repScores=scores;window._repSessions=semSessions;
+    renderRepTable();
+  }catch(e){set(`<div class="empty">${e.message}</div>`);}
+}
+
+function renderRepTable(){
+  const sessionFilter=document.getElementById("repSession")?.value||"";
+  const students=window._repStudents||[];
+  const allScores=window._repScores||[];
+  const scores=sessionFilter?allScores.filter(s=>s.session_id===sessionFilter):allScores;
+  const el=document.getElementById("repTable");
+  if(!el) return;
+  el.innerHTML=`<div class="tw"><table>
+    <thead><tr><th>#</th><th>Student</th><th>Reg No</th>${CATS.map(c=>`<th style="font-size:.65rem">${c.sw.split(" ")[0]}</th>`).join("")}<th>Overall</th></tr></thead>
+    <tbody>${students.map((st,i)=>{
+      const stScores=scores.filter(s=>s.student_id===st._id);
+      if(!stScores.length) return `<tr><td>${i+1}</td><td>${st.full_name}</td><td style="font-family:monospace">${st.reg_no}</td>${CATS.map(()=>`<td style="text-align:center;color:var(--muted)">—</td>`).join("")}<td style="text-align:center;color:var(--muted)">—</td></tr>`;
+      const catAvgs=CATS.map(cat=>{const vals=stScores.map(s=>Number(s[cat.id]||0));return vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):"—";});
+      const overall=(catAvgs.filter(a=>a!=="—").reduce((a,b)=>a+Number(b),0)/catAvgs.filter(a=>a!=="—").length||0).toFixed(2);
+      const ov=Number(overall);
+      return `<tr><td>${i+1}</td><td>${st.full_name}</td><td style="font-family:monospace">${st.reg_no}</td>${catAvgs.map(a=>`<td class="r" style="font-size:.72rem;color:${Number(a)>=4?"var(--ok)":Number(a)<3?"var(--err)":"inherit"}">${a}</td>`).join("")}<td class="r"><b style="color:${ov>=4?"var(--ok)":ov<3?"var(--err)":"var(--g)"}">${overall}</b></td></tr>`;
+    }).join("")}
+    </tbody>
+  </table></div>`;
+}
+
+function exportStudentsCSV(){
+  const rows=window._repStudents||[];
+  if(!rows.length){alert("No students to export.");return;}
+  const keys=["reg_no","full_name","gender","nationality","tribe","religion","marital_status","region","district","phone","church","pastor","reporting_date","reporting_status","status","semester_id"];
+  const esc2=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const csv=keys.join(",")+"\n"+rows.map(r=>keys.map(k=>esc2(r[k])).join(",")).join("\n");
+  dlCSV(csv,"KTC_Students_"+today());
+}
+
+function exportScoresCSV(){
+  const scores=window._repScores||[];
+  if(!scores.length){alert("No scores to export.");return;}
+  const keys=["session_id","student_name","reg_no","rater_name",...CATS.map(c=>c.id),...CATS.map(c=>c.id+"_comment"),"overall_avg","submitted","edited","locked"];
+  const esc2=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const csv=keys.join(",")+"\n"+scores.map(r=>keys.map(k=>esc2(r[k])).join(",")).join("\n");
+  dlCSV(csv,"KTC_Scores_"+today());
+}
+
+function exportClassSummary(){
+  const students=window._repStudents||[];
+  const scores=window._repScores||[];
+  const rows=students.map(st=>{
+    const stScores=scores.filter(s=>s.student_id===st._id);
+    const row={reg_no:st.reg_no,full_name:st.full_name,semester_id:st.semester_id};
+    CATS.forEach(cat=>{const vals=stScores.map(s=>Number(s[cat.id]||0));row[cat.sw]=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2):"—";});
+    const avgs=CATS.map(cat=>{const vals=stScores.map(s=>Number(s[cat.id]||0));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;}).filter(v=>v!==null);
+    row["Overall Average"]=avgs.length?(avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(2):"—";
+    return row;
+  });
+  if(!rows.length){alert("No data.");return;}
+  const keys=Object.keys(rows[0]);
+  const esc2=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const csv=keys.join(",")+"\n"+rows.map(r=>keys.map(k=>esc2(r[k])).join(",")).join("\n");
+  dlCSV(csv,"KTC_Class_Summary_"+today());
+}
+
+function dlCSV(csv,name){
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download=name+".csv";a.click();
+}
+
+/* ── CHANGE PASSWORD ── */
+function openCPw(){
+  openMod("Change password",`
+    <div class="fg">
+      <div class="field full"><label>Current password</label><input type="password" id="cpCur"></div>
+      <div class="field full"><label>New password *</label><input type="password" id="cpNew"></div>
+      <div class="field full"><label>Confirm new *</label><input type="password" id="cpConf"></div>
+    </div>
+    <div class="fa"><button class="btn bp" onclick="submitCPw()">Change</button><button class="btn bg" onclick="closeMod()">Cancel</button></div>
+    <div class="msg" id="cpMsg"></div>
+  `);
+}
+async function submitCPw(){
+  const msg=document.getElementById("cpMsg");
+  if(v("cpCur")!==USER.password){showMsg(msg,"err","Current password incorrect.");return;}
+  if(!v("cpNew")){showMsg(msg,"err","New password required.");return;}
+  if(v("cpNew")!==v("cpConf")){showMsg(msg,"err","Passwords do not match.");return;}
+  const res=await POST({action:"change_password",new_password:v("cpNew")});
+  if(res.ok){USER.password=v("cpNew");saveSession(USER);showMsg(msg,"ok","Password changed.");setTimeout(closeMod,1500);}
+  else showMsg(msg,"err",res.error||"Failed.");
+}
+
+/* ── UTILS ── */
+function v(id){const el=document.getElementById(id);return el?el.value.trim():"";}
+function today(){return new Date().toISOString().slice(0,10);}
+function initials(str){return (str||"").split(" ").filter(Boolean).map(w=>w[0]||"").join("").slice(0,2).toUpperCase()||"—";}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):"";}
+function esc(s){return String(s||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/"/g,"&quot;");}
+function showMsg(el,type,msg){if(!el)return;el.className="msg "+(type==="ok"?"mok":type==="warn"?"mwarn":"merr")+" show";el.innerHTML=msg;}
+function openMod(title,body){
+  document.getElementById("mTitle").textContent=title;
+  document.getElementById("mBody").innerHTML=body;
+  document.getElementById("mBox").classList.remove("wide");
+  document.getElementById("mBg").classList.add("open");
+  document.getElementById("mBg").scrollTop=0;
+}
+function closeMod(){document.getElementById("mBg").classList.remove("open");}
+function swTab(tabEl,panelId){
+  const ctx=tabEl.closest(".modal")||document.getElementById("pc");
+  ctx.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  ctx.querySelectorAll(".tpanel").forEach(p=>p.classList.remove("active"));
+  tabEl.classList.add("active");
+  const p=document.getElementById(panelId);if(p)p.classList.add("active");
+}
+</script>
+</body>
+</html>

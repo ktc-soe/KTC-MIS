@@ -287,6 +287,14 @@ td.r{text-align:right}.tlink{color:var(--g);cursor:pointer;text-decoration:under
   .sbbadge{margin:auto}.fg{grid-template-columns:1fr}.field.full{grid-column:1}
 }
 </style>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#08163a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kibidula KTC">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">
 </head>
 <body>
 <div class="offline-banner" id="offlineBanner">No internet · Hakuna mtandao</div>
@@ -2768,6 +2776,15 @@ function closeMod(){document.getElementById("mBg").classList.remove("open");}
 function swTab(tabEl,panelId){const ctx=tabEl.closest(".modal")||document.getElementById("pc");ctx.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));ctx.querySelectorAll(".tpanel").forEach(p=>p.classList.remove("active"));tabEl.classList.add("active");const p=document.getElementById(panelId);if(p)p.classList.add("active");}
 // App status pill classes
 const appStatusClass={accepted:"app-status-accepted",rejected:"app-status-rejected",waitlisted:"app-status-waitlisted",interview:"app-status-interview",pending:"app-status-pending"};
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (error) {
+      console.warn('Service worker registration failed:', error);
+    });
+  });
+}
 </script>
 </body>
 </html>
